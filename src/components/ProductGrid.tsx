@@ -1,4 +1,6 @@
+
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -85,19 +87,23 @@ export const ProductGrid = () => {
           {products.map((product) => (
             <Card key={product.id} className="group hover:shadow-hover transition-smooth overflow-hidden">
               <div className="relative aspect-square overflow-hidden">
-                <img
-                  src={product.image_url || frameCollection}
-                  alt={product.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-smooth"
-                />
+                <Link to={`/product/${product.id}`}>
+                  <img
+                    src={product.image_url || frameCollection}
+                    alt={product.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-smooth"
+                  />
+                </Link>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-smooth" />
                 <div className="absolute top-4 right-4 flex gap-2">
                   <Button size="icon" variant="secondary" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-smooth">
                     <Heart className="h-4 w-4" />
                   </Button>
-                  <Button size="icon" variant="secondary" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-smooth">
-                    <Eye className="h-4 w-4" />
-                  </Button>
+                  <Link to={`/product/${product.id}`}>
+                    <Button size="icon" variant="secondary" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-smooth">
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  </Link>
                 </div>
                 <div className="absolute top-4 left-4">
                   <Badge variant="secondary" className="bg-accent text-accent-foreground font-semibold">
@@ -107,9 +113,11 @@ export const ProductGrid = () => {
               </div>
               
               <CardContent className="p-6">
-                <h3 className="text-xl font-semibold text-foreground mb-2">
-                  {product.name}
-                </h3>
+                <Link to={`/product/${product.id}`}>
+                  <h3 className="text-xl font-semibold text-foreground mb-2 hover:text-primary transition-colors">
+                    {product.name}
+                  </h3>
+                </Link>
                 <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
                   {product.description}
                 </p>
