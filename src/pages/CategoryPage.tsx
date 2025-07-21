@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { ProductFilters } from "@/components/ProductFilters";
-import { ProductSearch } from "@/components/ProductSearch";
+import ProductFilters from "@/components/ProductFilters";
+import ProductSearch from "@/components/ProductSearch";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -194,8 +194,8 @@ const CategoryPage = () => {
           <div className="container mx-auto px-6">
             {/* Search and Filters */}
             <div className="mb-8 space-y-6">
-              <ProductSearch onSearch={handleSearch} />
-              <ProductFilters onFilter={handleFilter} />
+              <ProductSearch searchQuery="" onSearchChange={handleSearch} />
+              <ProductFilters filters={{categories: [], occasions: [], materials: [], priceRange: [0, 1000], inStock: false, minRating: 0}} onFiltersChange={handleFilter} />
             </div>
 
             {/* Products Grid */}
