@@ -7,12 +7,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Heart, ShoppingCart, Star, ChevronLeft, Share2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Heart, ShoppingCart, Star, ChevronLeft, Share2, Palette, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import ProductImageGallery from "@/components/ProductImageGallery";
 import ProductReviews from "@/components/ProductReviews";
 import RelatedProducts from "@/components/RelatedProducts";
+import FrameCustomizer from "@/components/FrameCustomizer";
+import QuickOrderModal from "@/components/QuickOrderModal";
 import frameCollection from "@/assets/frame-collection.jpg";
 
 interface Product {
@@ -33,6 +36,8 @@ const ProductDetail = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedQuantity, setSelectedQuantity] = useState(1);
+  const [showCustomizer, setShowCustomizer] = useState(false);
+  const [showQuickOrder, setShowQuickOrder] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -64,6 +69,17 @@ const ProductDetail = () => {
       toast.success(`${product.name} added to cart!`);
       // TODO: Implement cart functionality
     }
+  };
+
+  const handleCustomAddToCart = (customization: any) => {
+    console.log('Custom frame added to cart:', customization);
+    // TODO: Implement custom cart functionality
+    setShowCustomizer(false);
+  };
+
+  const handleQuickOrderCart = (orderData: any) => {
+    console.log('Quick order added to cart:', orderData);
+    // TODO: Implement quick order cart functionality
   };
 
   const handleAddToWishlist = () => {
@@ -196,18 +212,44 @@ const ProductDetail = () => {
                 </select>
               </div>
 
-              <div className="flex gap-4">
-                <Button 
-                  onClick={handleAddToCart}
-                  className="flex-1"
-                  disabled={product.stock_quantity === 0}
-                >
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  Add to Cart
-                </Button>
-                <Button variant="outline" size="icon">
-                  <Share2 className="h-4 w-4" />
-                </Button>
+              <div className="space-y-3">
+                {/* Express Order Options */}
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={() => setShowQuickOrder(true)}
+                    variant="default"
+                    className="flex-1"
+                    disabled={product.stock_quantity === 0}
+                  >
+                    <Zap className="h-4 w-4 mr-2" />
+                    Quick Order
+                  </Button>
+                  <Button 
+                    onClick={() => setShowCustomizer(true)}
+                    variant="outline"
+                    className="flex-1"
+                    disabled={product.stock_quantity === 0}
+                  >
+                    <Palette className="h-4 w-4 mr-2" />
+                    Customize Frame
+                  </Button>
+                </div>
+
+                {/* Traditional Add to Cart */}
+                <div className="flex gap-4">
+                  <Button 
+                    onClick={handleAddToCart}
+                    variant="secondary"
+                    className="flex-1"
+                    disabled={product.stock_quantity === 0}
+                  >
+                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    Basic Add to Cart
+                  </Button>
+                  <Button variant="outline" size="icon">
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
 
               {product.stock_quantity === 0 && (
@@ -245,6 +287,29 @@ const ProductDetail = () => {
         <RelatedProducts currentProductId={product.id} />
       </main>
       <Footer />
+
+      {/* Frame Customizer Modal */}
+      <Dialog open={showCustomizer} onOpenChange={setShowCustomizer}>
+        <DialogContent className="max-w-7xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Customize Your Frame</DialogTitle>
+          </DialogHeader>
+          {product && (
+            <FrameCustomizer
+              product={product}
+              onAddToCart={handleCustomAddToCart}
+              onClose={() => setShowCustomizer(false)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Quick Order Modal */}
+      <QuickOrderModal
+        isOpen={showQuickOrder}
+        onClose={() => setShowQuickOrder(false)}
+        onAddToCart={handleQuickOrderCart}
+      />
     </div>
   );
 };

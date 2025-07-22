@@ -18,39 +18,54 @@ export type Database = {
         Row: {
           color_id: string
           created_at: string
+          custom_height_inches: number | null
           custom_image_url: string | null
+          custom_width_inches: number | null
           id: string
+          matting_id: string | null
+          photo_id: string | null
           product_id: string
           quantity: number
           session_id: string | null
           size_id: string
           special_instructions: string | null
+          thickness_id: string | null
           updated_at: string
           user_id: string | null
         }
         Insert: {
           color_id: string
           created_at?: string
+          custom_height_inches?: number | null
           custom_image_url?: string | null
+          custom_width_inches?: number | null
           id?: string
+          matting_id?: string | null
+          photo_id?: string | null
           product_id: string
           quantity?: number
           session_id?: string | null
           size_id: string
           special_instructions?: string | null
+          thickness_id?: string | null
           updated_at?: string
           user_id?: string | null
         }
         Update: {
           color_id?: string
           created_at?: string
+          custom_height_inches?: number | null
           custom_image_url?: string | null
+          custom_width_inches?: number | null
           id?: string
+          matting_id?: string | null
+          photo_id?: string | null
           product_id?: string
           quantity?: number
           session_id?: string | null
           size_id?: string
           special_instructions?: string | null
+          thickness_id?: string | null
           updated_at?: string
           user_id?: string | null
         }
@@ -60,6 +75,20 @@ export type Database = {
             columns: ["color_id"]
             isOneToOne: false
             referencedRelation: "frame_colors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cart_items_matting_id_fkey"
+            columns: ["matting_id"]
+            isOneToOne: false
+            referencedRelation: "matting_options"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cart_items_photo_id_fkey"
+            columns: ["photo_id"]
+            isOneToOne: false
+            referencedRelation: "uploaded_photos"
             referencedColumns: ["id"]
           },
           {
@@ -74,6 +103,13 @@ export type Database = {
             columns: ["size_id"]
             isOneToOne: false
             referencedRelation: "frame_sizes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cart_items_thickness_id_fkey"
+            columns: ["thickness_id"]
+            isOneToOne: false
+            referencedRelation: "frame_thickness"
             referencedColumns: ["id"]
           },
         ]
@@ -162,6 +198,66 @@ export type Database = {
           is_active?: boolean
           price_multiplier?: number
           width_inches?: number
+        }
+        Relationships: []
+      }
+      frame_thickness: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          price_multiplier: number
+          width_inches: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          price_multiplier?: number
+          width_inches: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          price_multiplier?: number
+          width_inches?: number
+        }
+        Relationships: []
+      }
+      matting_options: {
+        Row: {
+          color_hex: string
+          created_at: string
+          id: string
+          is_active: boolean
+          is_double_mat: boolean
+          name: string
+          price_adjustment: number
+          thickness_inches: number
+        }
+        Insert: {
+          color_hex: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_double_mat?: boolean
+          name: string
+          price_adjustment?: number
+          thickness_inches: number
+        }
+        Update: {
+          color_hex?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_double_mat?: boolean
+          name?: string
+          price_adjustment?: number
+          thickness_inches?: number
         }
         Relationships: []
       }
@@ -313,6 +409,87 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      popular_combinations: {
+        Row: {
+          color_id: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          is_staff_pick: boolean
+          matting_id: string | null
+          name: string
+          popularity_score: number
+          product_id: string
+          size_id: string
+          thickness_id: string | null
+        }
+        Insert: {
+          color_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_staff_pick?: boolean
+          matting_id?: string | null
+          name: string
+          popularity_score?: number
+          product_id: string
+          size_id: string
+          thickness_id?: string | null
+        }
+        Update: {
+          color_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_staff_pick?: boolean
+          matting_id?: string | null
+          name?: string
+          popularity_score?: number
+          product_id?: string
+          size_id?: string
+          thickness_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "popular_combinations_color_id_fkey"
+            columns: ["color_id"]
+            isOneToOne: false
+            referencedRelation: "frame_colors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "popular_combinations_matting_id_fkey"
+            columns: ["matting_id"]
+            isOneToOne: false
+            referencedRelation: "matting_options"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "popular_combinations_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "popular_combinations_size_id_fkey"
+            columns: ["size_id"]
+            isOneToOne: false
+            referencedRelation: "frame_sizes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "popular_combinations_thickness_id_fkey"
+            columns: ["thickness_id"]
+            isOneToOne: false
+            referencedRelation: "frame_thickness"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       product_categories: {
         Row: {
@@ -588,6 +765,51 @@ export type Database = {
           is_active?: boolean
           name?: string
           slug?: string
+        }
+        Relationships: []
+      }
+      uploaded_photos: {
+        Row: {
+          created_at: string
+          dpi: number | null
+          file_name: string
+          file_size: number
+          file_type: string
+          height_pixels: number
+          id: string
+          is_processed: boolean
+          session_id: string | null
+          storage_path: string
+          user_id: string | null
+          width_pixels: number
+        }
+        Insert: {
+          created_at?: string
+          dpi?: number | null
+          file_name: string
+          file_size: number
+          file_type: string
+          height_pixels: number
+          id?: string
+          is_processed?: boolean
+          session_id?: string | null
+          storage_path: string
+          user_id?: string | null
+          width_pixels: number
+        }
+        Update: {
+          created_at?: string
+          dpi?: number | null
+          file_name?: string
+          file_size?: number
+          file_type?: string
+          height_pixels?: number
+          id?: string
+          is_processed?: boolean
+          session_id?: string | null
+          storage_path?: string
+          user_id?: string | null
+          width_pixels?: number
         }
         Relationships: []
       }
