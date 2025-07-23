@@ -10,6 +10,12 @@ import ProductDetail from "./pages/ProductDetail";
 import CategoryPage from "./pages/CategoryPage";
 import OccasionPage from "./pages/OccasionPage";
 import Gallery from "./pages/Gallery";
+import HelpCenter from "./pages/HelpCenter";
+import Contact from "./pages/Contact";
+import Shipping from "./pages/Shipping";
+import Returns from "./pages/Returns";
+import SizeGuide from "./pages/SizeGuide";
+import CareInstructions from "./pages/CareInstructions";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +28,12 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/gallery" element={<Gallery />} />
+          <Route path="/help-center" element={<HelpCenter />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/shipping" element={<Shipping />} />
+          <Route path="/returns" element={<Returns />} />
+          <Route path="/size-guide" element={<SizeGuide />} />
+          <Route path="/care-instructions" element={<CareInstructions />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/category/:slug" element={<CategoryPage />} />
           <Route path="/occasion/:slug" element={<OccasionPage />} />

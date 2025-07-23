@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
@@ -9,6 +10,7 @@ import {
   MapPin,
   Heart
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -43,23 +45,46 @@ export const Footer = () => {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Quick Links</h3>
             <ul className="space-y-2">
-              {[
-                'Custom Frames',
-                'Gallery',
-                'Materials Guide',
-                'Size Calculator',
-                'Design Studio',
-                'Bulk Orders'
-              ].map((link) => (
-                <li key={link}>
-                  <a 
-                    href="#" 
-                    className="text-primary-foreground/80 hover:text-accent transition-smooth"
-                  >
-                    {link}
-                  </a>
-                </li>
-              ))}
+              <li>
+                <Link 
+                  to="/#products" 
+                  className="text-primary-foreground/80 hover:text-accent transition-smooth"
+                >
+                  Custom Frames
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/gallery" 
+                  className="text-primary-foreground/80 hover:text-accent transition-smooth"
+                >
+                  Gallery
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/size-guide" 
+                  className="text-primary-foreground/80 hover:text-accent transition-smooth"
+                >
+                  Size Guide
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/care-instructions" 
+                  className="text-primary-foreground/80 hover:text-accent transition-smooth"
+                >
+                  Care Instructions
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/contact" 
+                  className="text-primary-foreground/80 hover:text-accent transition-smooth"
+                >
+                  Contact Us
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -67,23 +92,54 @@ export const Footer = () => {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Support</h3>
             <ul className="space-y-2">
-              {[
-                'Help Center',
-                'Shipping Info',
-                'Returns',
-                'Size Guide',
-                'Care Instructions',
-                'Contact Us'
-              ].map((link) => (
-                <li key={link}>
-                  <a 
-                    href="#" 
-                    className="text-primary-foreground/80 hover:text-accent transition-smooth"
-                  >
-                    {link}
-                  </a>
-                </li>
-              ))}
+              <li>
+                <Link 
+                  to="/help-center" 
+                  className="text-primary-foreground/80 hover:text-accent transition-smooth"
+                >
+                  Help Center
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/shipping" 
+                  className="text-primary-foreground/80 hover:text-accent transition-smooth"
+                >
+                  Shipping Info
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/returns" 
+                  className="text-primary-foreground/80 hover:text-accent transition-smooth"
+                >
+                  Returns
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/size-guide" 
+                  className="text-primary-foreground/80 hover:text-accent transition-smooth"
+                >
+                  Size Guide
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/care-instructions" 
+                  className="text-primary-foreground/80 hover:text-accent transition-smooth"
+                >
+                  Care Instructions
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/contact" 
+                  className="text-primary-foreground/80 hover:text-accent transition-smooth"
+                >
+                  Contact Us
+                </Link>
+              </li>
             </ul>
           </div>
 
