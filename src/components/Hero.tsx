@@ -1,8 +1,22 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Star } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/hero-frames.jpg";
 
 export const Hero = () => {
+  const navigate = useNavigate();
+
+  const handleStartCustomizing = () => {
+    const productsSection = document.getElementById('products');
+    if (productsSection) {
+      productsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleViewGallery = () => {
+    navigate('/gallery');
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center bg-gradient-hero overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-background/95 to-background/80 z-10" />
@@ -35,11 +49,11 @@ export const Hero = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button variant="hero" size="xl" className="group">
+            <Button variant="hero" size="xl" className="group" onClick={handleStartCustomizing}>
               Start Customizing
               <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <Button variant="elegant" size="xl">
+            <Button variant="elegant" size="xl" onClick={handleViewGallery}>
               View Gallery
             </Button>
           </div>

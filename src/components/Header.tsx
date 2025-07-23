@@ -3,18 +3,30 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { Menu, ShoppingCart, User, Search, Heart, X } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [cartCount] = useState(3); // TODO: Connect to cart state
+  const navigate = useNavigate();
+
+  const handleCustomFrames = () => {
+    navigate('/#products');
+    setTimeout(() => {
+      const productsSection = document.getElementById('products');
+      if (productsSection) {
+        productsSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
+  };
 
   const navigation = [
-    { name: 'Home', href: '#' },
-    { name: 'Gallery', href: '#gallery' },
-    { name: 'Custom Frames', href: '#customize' },
-    { name: 'Materials', href: '#materials' },
-    { name: 'About', href: '#about' },
-    { name: 'Contact', href: '#contact' }
+    { name: 'Home', href: '/', isLink: true },
+    { name: 'Gallery', href: '/gallery', isLink: true },
+    { name: 'Custom Frames', href: '#customize', isLink: false, onClick: handleCustomFrames },
+    { name: 'Materials', href: '#materials', isLink: false },
+    { name: 'About', href: '#about', isLink: false },
+    { name: 'Contact', href: '#contact', isLink: false }
   ];
 
   return (
@@ -23,22 +35,33 @@ export const Header = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <div className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+            <Link to="/" className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
               FrameCraft
-            </div>
+            </Link>
           </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-8">
             {navigation.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className="text-foreground hover:text-accent transition-smooth relative group"
-              >
-                {item.name}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent transition-all group-hover:w-full" />
-              </a>
+              item.isLink ? (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className="text-foreground hover:text-accent transition-smooth relative group"
+                >
+                  {item.name}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent transition-all group-hover:w-full" />
+                </Link>
+              ) : (
+                <button
+                  key={item.name}
+                  onClick={item.onClick}
+                  className="text-foreground hover:text-accent transition-smooth relative group"
+                >
+                  {item.name}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent transition-all group-hover:w-full" />
+                </button>
+              )
             ))}
           </nav>
 
@@ -104,14 +127,27 @@ export const Header = () => {
                 
                 <nav className="flex flex-col space-y-4">
                   {navigation.map((item) => (
-                    <a
-                      key={item.name}
-                      href={item.href}
-                      className="text-lg text-foreground hover:text-accent transition-smooth py-2"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {item.name}
-                    </a>
+                    item.isLink ? (
+                      <Link
+                        key={item.name}
+                        to={item.href}
+                        className="text-lg text-foreground hover:text-accent transition-smooth py-2"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        {item.name}
+                      </Link>
+                    ) : (
+                      <button
+                        key={item.name}
+                        onClick={() => {
+                          item.onClick?.();
+                          setIsMenuOpen(false);
+                        }}
+                        className="text-lg text-foreground hover:text-accent transition-smooth py-2 text-left"
+                      >
+                        {item.name}
+                      </button>
+                    )
                   ))}
                 </nav>
                 

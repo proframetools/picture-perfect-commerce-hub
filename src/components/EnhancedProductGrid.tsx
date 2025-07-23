@@ -232,7 +232,7 @@ export default function EnhancedProductGrid() {
   }
 
   return (
-    <section className="py-20 bg-background">
+    <section id="products" className="py-20 bg-background">
       <div className="container mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-12">
