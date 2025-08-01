@@ -105,7 +105,7 @@ export const Features = () => {
               </CardContent>
             </Card>
           ))}
-        </div>
+                  </div>
       </div>
     </section>
   );

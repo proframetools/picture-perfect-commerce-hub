@@ -7,14 +7,19 @@ export const Hero = () => {
   const navigate = useNavigate();
 
   const handleStartCustomizing = () => {
+    // First try to scroll to featured products, then fall back to main products
+    const featuredSection = document.getElementById('featured-products');
     const productsSection = document.getElementById('products');
-    if (productsSection) {
+    
+    if (featuredSection) {
+      featuredSection.scrollIntoView({ behavior: 'smooth' });
+    } else if (productsSection) {
       productsSection.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
-  const handleViewGallery = () => {
-    navigate('/gallery');
+  const handleViewProducts = () => {
+    navigate('/products');
   };
 
   return (
@@ -53,8 +58,8 @@ export const Hero = () => {
               Start Customizing
               <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <Button variant="elegant" size="xl" onClick={handleViewGallery}>
-              View Gallery
+                      <Button variant="elegant" size="xl" onClick={handleViewProducts}>
+            View Products
             </Button>
           </div>
           

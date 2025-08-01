@@ -179,14 +179,19 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
         } : p
       ));
 
-      // Notify parent component
-      onPhotoUploaded({
+      // Create the photo data object that will be passed to parent
+      const uploadedPhotoData = {
         id: photoData.id,
         url,
         fileName: file.name,
         width: dimensions.width,
         height: dimensions.height
-      });
+      };
+
+      console.log('PhotoUpload: Notifying parent with photo data:', uploadedPhotoData);
+
+      // Notify parent component
+      onPhotoUploaded(uploadedPhotoData);
 
       toast.success('Photo uploaded successfully!');
 

@@ -47,7 +47,7 @@ export const Footer = () => {
             <ul className="space-y-2">
               <li>
                 <Link 
-                  to="/#products" 
+                  to="/products" 
                   className="text-primary-foreground/80 hover:text-accent transition-smooth"
                 >
                   Custom Frames
@@ -55,10 +55,10 @@ export const Footer = () => {
               </li>
               <li>
                 <Link 
-                  to="/gallery" 
+                  to="/products" 
                   className="text-primary-foreground/80 hover:text-accent transition-smooth"
                 >
-                  Gallery
+                  Products
                 </Link>
               </li>
               <li>

@@ -7,6 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { formatPrice } from '@/lib/currency';
 import PhotoUpload from './PhotoUpload';
 import FramePreview from './FramePreview';
 import { ShoppingCart, Heart, Star, Zap } from 'lucide-react';
@@ -64,9 +65,22 @@ interface PopularCombination {
   popularity_score: number;
 }
 
+interface CustomizationOptions {
+  product_id: string;
+  size_id?: string;
+  color_id?: string;
+  thickness_id?: string;
+  matting_id?: string;
+  photo_id?: string;
+  custom_width_inches?: number | null;
+  custom_height_inches?: number | null;
+  photo_position?: { x: number; y: number; scale: number; rotation: number } | null;
+  total_price: number;
+}
+
 interface FrameCustomizerProps {
   product: Product;
-  onAddToCart: (customization: any) => void;
+  onAddToCart: (customization: CustomizationOptions) => void;
   onClose?: () => void;
 }
 
@@ -83,7 +97,14 @@ const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
   const [customWidth, setCustomWidth] = useState<string>('');
   const [customHeight, setCustomHeight] = useState<string>('');
   const [isCustomSize, setIsCustomSize] = useState(false);
-  const [uploadedPhoto, setUploadedPhoto] = useState<any>(null);
+  const [uploadedPhoto, setUploadedPhoto] = useState<{
+    id: string;
+    url: string;
+    fileName: string;
+    width: number;
+    height: number;
+    dpi?: number;
+  } | null>(null);
   const [photoPosition, setPhotoPosition] = useState({ x: 0, y: 0, scale: 1, rotation: 0 });
   
   // Available options
@@ -279,7 +300,11 @@ const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
             </CardHeader>
             <CardContent>
               <PhotoUpload
-                onPhotoUploaded={setUploadedPhoto}
+                onPhotoUploaded={(photo) => {
+                  console.log('FrameCustomizer: Received photo data:', photo);
+                  setUploadedPhoto(photo);
+                  toast.success('Photo uploaded! View it in the preview →');
+                }}
                 maxFiles={1}
                 acceptMultiple={false}
               />
@@ -321,7 +346,7 @@ const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
                     >
                       <div className="font-medium">{size.display_name}</div>
                       <div className="text-xs text-muted-foreground">
-                        ${(product.base_price * size.price_multiplier).toFixed(2)}
+                        {formatPrice(product.base_price * size.price_multiplier)}
                       </div>
                     </button>
                   ))}
@@ -379,11 +404,11 @@ const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
                       style={{ backgroundColor: color.hex_code }}
                     />
                     <div className="text-xs font-medium">{color.name}</div>
-                    {color.price_adjustment > 0 && (
-                      <div className="text-xs text-muted-foreground">
-                        +${color.price_adjustment}
-                      </div>
-                    )}
+                        {color.price_adjustment > 0 && (
+                          <div className="text-xs text-primary">
+                            +{formatPrice(color.price_adjustment)}
+                          </div>
+                        )}
                   </button>
                 ))}
               </div>
@@ -455,7 +480,7 @@ const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
                         <div className="font-medium">{matting.name}</div>
                         <div className="text-xs text-muted-foreground">
                           {matting.is_double_mat ? 'Double Mat' : 'Single Mat'} • 
-                          +${matting.price_adjustment}
+                          +{formatPrice(matting.price_adjustment)}
                         </div>
                       </div>
                     </div>
@@ -466,23 +491,73 @@ const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
           </Card>
         </div>
 
-        {/* Preview Panel */}
+        {/* Preview Panel - Always Visible */}
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Preview</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle>Live Preview</CardTitle>
+                <div className="flex items-center gap-2">
+                  {uploadedPhoto && (
+                    <Badge variant="secondary" className="text-xs">
+                      Photo Loaded
+                    </Badge>
+                  )}
+                  <Badge variant="outline" className="text-xs">
+                    Real-time Updates
+                  </Badge>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               <FramePreview
                 photoUrl={uploadedPhoto?.url}
                 frameColor={selectedColor?.hex_code || '#8B4513'}
-                frameWidth={selectedThickness?.width_inches ? selectedThickness.width_inches * 10 : 20}
+                frameWidth={selectedThickness?.width_inches ? Math.max(selectedThickness.width_inches * 0.8, 8) : 12}
                 mattingColor={selectedMatting?.color_hex}
-                mattingThickness={selectedMatting?.thickness_inches ? selectedMatting.thickness_inches * 100 : 0}
+                mattingThickness={selectedMatting?.thickness_inches ? Math.max(selectedMatting.thickness_inches * 5, 5) : 0}
+                canvasWidth={500}
+                canvasHeight={600}
                 onPositionChange={setPhotoPosition}
               />
+              <div className="mt-4 text-center">
+                {!uploadedPhoto ? (
+                  <p className="text-sm text-muted-foreground">
+                    Upload a photo to see it in your custom frame
+                  </p>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    Use the controls above to adjust your photo position
+                  </p>
+                )}
+              </div>
             </CardContent>
           </Card>
+
+          {/* Photo Information */}
+          {uploadedPhoto && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Photo Details</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Filename:</span>
+                  <span className="font-medium">{uploadedPhoto.fileName}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Dimensions:</span>
+                  <span>{uploadedPhoto.width} × {uploadedPhoto.height} pixels</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Quality:</span>
+                  <Badge variant="outline" className="text-xs">
+                    {uploadedPhoto.width >= 1200 && uploadedPhoto.height >= 1800 ? 'High Quality' : 'Standard Quality'}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Price Summary */}
           <Card>
@@ -493,7 +568,7 @@ const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span>Base Frame ({product.name})</span>
-                  <span>${product.base_price.toFixed(2)}</span>
+                  <span>{formatPrice(product.base_price)}</span>
                 </div>
                 
                 {selectedSize && (
@@ -506,7 +581,7 @@ const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
                 {selectedColor && selectedColor.price_adjustment > 0 && (
                   <div className="flex justify-between">
                     <span>Color ({selectedColor.name})</span>
-                    <span>+${selectedColor.price_adjustment.toFixed(2)}</span>
+                    <span>+{formatPrice(selectedColor.price_adjustment)}</span>
                   </div>
                 )}
                 
@@ -520,7 +595,7 @@ const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
                 {selectedMatting && (
                   <div className="flex justify-between">
                     <span>Matting ({selectedMatting.name})</span>
-                    <span>+${selectedMatting.price_adjustment.toFixed(2)}</span>
+                    <span>+{formatPrice(selectedMatting.price_adjustment)}</span>
                   </div>
                 )}
 
@@ -536,7 +611,7 @@ const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
               
               <div className="flex justify-between text-lg font-bold">
                 <span>Total Price</span>
-                <span>${calculatePrice().toFixed(2)}</span>
+                <span>{formatPrice(calculatePrice())}</span>
               </div>
               
               <div className="flex gap-3 pt-4">

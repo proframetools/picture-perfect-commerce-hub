@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { formatPrice } from '@/lib/currency';
 import { ShoppingCart, Star, Zap, Clock } from 'lucide-react';
 
 interface PopularCombination {
@@ -223,7 +224,7 @@ const QuickOrderModal: React.FC<QuickOrderModalProps> = ({
                           <div className="flex items-center justify-between pt-3 border-t">
                             <div>
                               <span className="text-2xl font-bold text-primary">
-                                ${calculateCombinationPrice(combo).toFixed(2)}
+                                {formatPrice(calculateCombinationPrice(combo))}
                               </span>
                             </div>
                             <Button
@@ -287,7 +288,7 @@ const QuickOrderModal: React.FC<QuickOrderModalProps> = ({
                         <div className="flex items-center justify-between pt-3 border-t">
                           <div>
                             <span className="text-2xl font-bold text-primary">
-                              ${calculateCombinationPrice(combo).toFixed(2)}
+                              {formatPrice(calculateCombinationPrice(combo))}
                             </span>
                           </div>
                           <Button

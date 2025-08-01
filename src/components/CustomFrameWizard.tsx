@@ -8,12 +8,21 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { ChevronLeft, ChevronRight, Check, Camera, Palette, Ruler, Eye, ShoppingCart } from 'lucide-react';
 
+// Import WhatsApp utilities
+import { WhatsAppButton } from '@/components/ui/whatsapp-button';
+import { openWhatsAppWithOrder, generateOrderMessage, openWhatsApp, type FrameOrder } from '@/lib/whatsapp';
+import { formatIndianCurrency } from '@/lib/currency';
+import { handlePhotoShareWorkflow } from '@/lib/whatsapp-photo';
+
 // Import step components
 import PhotoStepComponent from './wizard-steps/PhotoStepComponent';
 import SizeStepComponent from './wizard-steps/SizeStepComponent';
 import FrameStepComponent from './wizard-steps/FrameStepComponent';
 import StyleStepComponent from './wizard-steps/StyleStepComponent';
 import ReviewStepComponent from './wizard-steps/ReviewStepComponent';
+
+// Import FramePreview for always-visible preview
+import FramePreview from './FramePreview';
 
 interface Product {
   id: string;
@@ -24,20 +33,74 @@ interface Product {
   image_url: string | null;
 }
 
+interface CustomizationData {
+  product_id: string;
+  photo_id?: string;
+  size_id?: string;
+  color_id?: string;
+  thickness_id?: string;
+  matting_id?: string;
+  custom_width_inches?: number;
+  custom_height_inches?: number;
+  photo_position?: { x: number; y: number; scale: number; rotation: number };
+  total_price: number;
+  glass_type?: string;
+}
+
 interface CustomFrameWizardProps {
   product: Product;
-  onAddToCart: (customization: any) => void;
+  onAddToCart: (customization: CustomizationData) => void;
   onClose?: () => void;
 }
 
+interface PhotoData {
+  id: string;
+  url: string;
+  fileName: string;
+  width: number;
+  height: number;
+  dpi?: number;
+}
+
+interface SizeData {
+  id: string;
+  display_name: string;
+  width_inches: number;
+  height_inches: number;
+  price_multiplier: number;
+}
+
+interface ColorData {
+  id: string;
+  name: string;
+  hex_code: string;
+  price_adjustment: number;
+}
+
+interface ThicknessData {
+  id: string;
+  name: string;
+  width_inches: number;
+  price_multiplier: number;
+}
+
+interface MattingData {
+  id: string;
+  name: string;
+  color_hex: string;
+  thickness_inches: number;
+  is_double_mat: boolean;
+  price_adjustment: number;
+}
+
 export interface WizardData {
-  photo?: any;
+  photo?: PhotoData;
   photoPosition?: { x: number; y: number; scale: number; rotation: number };
-  size?: any;
+  size?: SizeData;
   customDimensions?: { width: number; height: number };
-  color?: any;
-  thickness?: any;
-  matting?: any;
+  color?: ColorData;
+  thickness?: ThicknessData;
+  matting?: MattingData;
   glassType?: string;
   totalPrice: number;
 }
@@ -187,6 +250,57 @@ const CustomFrameWizard: React.FC<CustomFrameWizardProps> = ({
     toast.success('Custom frame added to cart!');
   };
 
+  const handleWhatsAppOrder = async () => {
+    if (!stepValidation.review) {
+      toast.error('Please complete all required steps');
+      return;
+    }
+
+    const frameOrder: FrameOrder = {
+      frameName: product.name,
+      size: wizardData.size ? {
+        display_name: wizardData.size.display_name,
+        width_inches: wizardData.size.width_inches,
+        height_inches: wizardData.size.height_inches
+      } : undefined,
+      customDimensions: wizardData.customDimensions ? {
+        width: wizardData.customDimensions.width,
+        height: wizardData.customDimensions.height,
+        unit: 'inches' as const
+      } : undefined,
+      material: product.material,
+      color: wizardData.color ? {
+        name: wizardData.color.name
+      } : undefined,
+      thickness: wizardData.thickness ? {
+        name: wizardData.thickness.name
+      } : undefined,
+      matting: wizardData.matting ? {
+        name: wizardData.matting.name
+      } : undefined,
+      totalPrice: wizardData.totalPrice,
+      hasPhoto: !!wizardData.photo
+    };
+
+    const orderMessage = generateOrderMessage(frameOrder);
+
+    if (wizardData.photo) {
+      // For photo sharing, we need to create a File object from the photo URL
+      try {
+        const response = await fetch(wizardData.photo.url);
+        const blob = await response.blob();
+        const file = new File([blob], wizardData.photo.fileName, { type: blob.type });
+        await handlePhotoShareWorkflow(file, orderMessage);
+      } catch (error) {
+        console.error('Error preparing photo for sharing:', error);
+        toast.error('Failed to prepare photo. Opening WhatsApp without photo.');
+        openWhatsApp(orderMessage);
+      }
+    } else {
+      openWhatsApp(orderMessage);
+    }
+  };
+
   const renderStepContent = () => {
     const stepId = STEPS[currentStep].id;
 
@@ -241,7 +355,7 @@ const CustomFrameWizard: React.FC<CustomFrameWizardProps> = ({
   const progressPercentage = ((currentStep + 1) / STEPS.length) * 100;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="max-w-7xl mx-auto space-y-6">
       {/* Progress Header */}
       <Card>
         <CardHeader className="pb-4">
@@ -306,9 +420,114 @@ const CustomFrameWizard: React.FC<CustomFrameWizardProps> = ({
         </CardHeader>
       </Card>
 
-      {/* Current Step Content */}
-      <div className="min-h-[600px]">
-        {renderStepContent()}
+      {/* Main Content with Side-by-Side Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Step Content */}
+        <div className="min-h-[600px]">
+          {renderStepContent()}
+        </div>
+
+        {/* Always Visible Preview Panel */}
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Eye className="h-5 w-5" />
+                Live Preview
+                {/* Debug info in development */}
+                {process.env.NODE_ENV === 'development' && wizardData.photo && (
+                  <Badge variant="outline" className="text-xs ml-2">
+                    Photo: {wizardData.photo.url ? 'URL OK' : 'No URL'}
+                  </Badge>
+                )}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {/* Debug the photo data being passed */}
+              {process.env.NODE_ENV === 'development' && (
+                <div className="mb-4 p-2 bg-muted rounded text-xs">
+                  <div>Photo URL: {wizardData.photo?.url || 'None'}</div>
+                  <div>Photo ID: {wizardData.photo?.id || 'None'}</div>
+                  <div>Frame Color: {wizardData.color?.hex_code || '#8B4513'}</div>
+                  <div>Frame Width: {wizardData.thickness ? wizardData.thickness.width_inches * 10 : 20}</div>
+                </div>
+              )}
+              
+              <FramePreview
+                photoUrl={wizardData.photo?.url}
+                frameColor={wizardData.color?.hex_code || '#8B4513'}
+                frameWidth={wizardData.thickness ? wizardData.thickness.width_inches * 10 : 20}
+                mattingColor={wizardData.matting?.color_hex}
+                mattingThickness={wizardData.matting ? wizardData.matting.thickness_inches * 100 : 0}
+                canvasWidth={400}
+                canvasHeight={500}
+                onPositionChange={(position) => updateWizardData({ photoPosition: position })}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Current Selection Summary */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Current Selection</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Photo:</span>
+                  <span>{wizardData.photo ? '✓ Uploaded' : 'Not uploaded'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Size:</span>
+                  <span>
+                    {wizardData.size ? wizardData.size.display_name : 
+                     wizardData.customDimensions ? `${wizardData.customDimensions.width}" × ${wizardData.customDimensions.height}"` :
+                     'Not selected'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Color:</span>
+                  <span className="flex items-center gap-2">
+                    {wizardData.color ? (
+                      <>
+                        <div 
+                          className="w-4 h-4 rounded border"
+                          style={{ backgroundColor: wizardData.color.hex_code }}
+                        />
+                        {wizardData.color.name}
+                      </>
+                    ) : 'Not selected'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Thickness:</span>
+                  <span>{wizardData.thickness?.name || 'Not selected'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Matting:</span>
+                  <span className="flex items-center gap-2">
+                    {wizardData.matting ? (
+                      <>
+                        <div 
+                          className="w-4 h-4 rounded border"
+                          style={{ backgroundColor: wizardData.matting.color_hex }}
+                        />
+                        {wizardData.matting.name}
+                      </>
+                    ) : 'None'}
+                  </span>
+                </div>
+              </div>
+              
+              <Separator />
+              
+              <div className="flex justify-between items-center text-lg font-bold">
+                <span>Current Total</span>
+                <span>{formatIndianCurrency(wizardData.totalPrice)}</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* Navigation Footer */}
@@ -328,21 +547,31 @@ const CustomFrameWizard: React.FC<CustomFrameWizardProps> = ({
             </div>
 
             <div className="text-center">
-              <p className="text-sm text-muted-foreground">Current Total</p>
-              <p className="text-2xl font-bold">${wizardData.totalPrice.toFixed(2)}</p>
+              <p className="text-sm text-muted-foreground">Step {currentStep + 1} of {STEPS.length}</p>
+              <p className="text-xl font-bold">{STEPS[currentStep].title}</p>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               {currentStep === STEPS.length - 1 ? (
-                <Button
-                  onClick={handleAddToCart}
-                  disabled={!stepValidation.review}
-                  className="flex items-center gap-2"
-                  size="lg"
-                >
-                  <ShoppingCart className="h-4 w-4" />
-                  Add to Cart
-                </Button>
+                <>
+                  <WhatsAppButton
+                    onClick={handleWhatsAppOrder}
+                    disabled={!stepValidation.review}
+                    size="lg"
+                  >
+                    Order via WhatsApp
+                  </WhatsAppButton>
+                  <Button
+                    onClick={handleAddToCart}
+                    disabled={!stepValidation.review}
+                    className="flex items-center gap-2"
+                    size="lg"
+                    variant="outline"
+                  >
+                    <ShoppingCart className="h-4 w-4" />
+                    Add to Cart
+                  </Button>
+                </>
               ) : (
                 <Button
                   onClick={nextStep}

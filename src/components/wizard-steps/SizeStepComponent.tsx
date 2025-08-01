@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { formatPrice } from '@/lib/currency';
 import { Ruler, Calculator, Zap, Home } from 'lucide-react';
 import { WizardData } from '../CustomFrameWizard';
 
@@ -177,7 +178,7 @@ const SizeStepComponent: React.FC<SizeStepComponentProps> = ({
                       onClick={() => handleSizeSelect(getSizeRecommendation()!)}
                       className="border-green-300 hover:bg-green-100"
                     >
-                      {getSizeRecommendation()?.display_name} - ${(product.base_price * getSizeRecommendation()!.price_multiplier).toFixed(2)}
+                      {getSizeRecommendation()?.display_name} - {formatPrice(product.base_price * getSizeRecommendation()!.price_multiplier)}
                     </Button>
                   </CardContent>
                 </Card>
@@ -203,7 +204,7 @@ const SizeStepComponent: React.FC<SizeStepComponentProps> = ({
                       >
                         <div className="font-medium">{size.display_name}</div>
                         <div className="text-sm text-muted-foreground mt-1">
-                          ${(product.base_price * size.price_multiplier).toFixed(2)}
+                          {formatPrice(product.base_price * size.price_multiplier)}
                         </div>
                         <Badge variant="secondary" className="mt-2 text-xs">
                           Popular
@@ -230,7 +231,7 @@ const SizeStepComponent: React.FC<SizeStepComponentProps> = ({
                     >
                       <div className="font-medium text-sm">{size.display_name}</div>
                       <div className="text-xs text-muted-foreground mt-1">
-                        ${(product.base_price * size.price_multiplier).toFixed(2)}
+                        {formatPrice(product.base_price * size.price_multiplier)}
                       </div>
                     </button>
                   ))}
@@ -283,7 +284,7 @@ const SizeStepComponent: React.FC<SizeStepComponentProps> = ({
                         <strong>Custom Size:</strong> {customWidth}" × {customHeight}"
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        Estimated Price: ${wizardData.totalPrice.toFixed(2)} (includes 20% custom size premium)
+                        Estimated Price: {formatPrice(wizardData.totalPrice)} (includes 20% custom size premium)
                       </p>
                     </div>
                   )}
@@ -325,7 +326,7 @@ const SizeStepComponent: React.FC<SizeStepComponentProps> = ({
             {roomVisualization && (
               <div className="relative bg-gradient-to-b from-blue-100 to-blue-50 rounded-lg p-8 min-h-[200px]">
                 {/* Simulated room background */}
-                <div className="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.1"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] rounded-lg"></div>
+                <div className="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%239C92AC%22%20fill-opacity%3D%220.1%22%3E%3Cpath%20d%3D%22M36%2034v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6%2034v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6%204V0H4v4H0v2h4v4h2V6h4V4H6z%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] rounded-lg"></div>
                 
                 {/* Frame representation */}
                 <div className="relative mx-auto" style={{

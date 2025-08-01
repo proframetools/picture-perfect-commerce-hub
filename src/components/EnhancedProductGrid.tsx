@@ -10,6 +10,9 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/s
 import ProductFilters from './ProductFilters';
 import ProductSearch from './ProductSearch';
 import frameCollection from '@/assets/frame-collection.jpg';
+import { WhatsAppButton } from '@/components/ui/whatsapp-button';
+import { openWhatsAppInquiry } from '@/lib/whatsapp';
+import { formatPrice, PRICE_RANGES } from '@/lib/currency';
 
 interface Product {
   id: string;
@@ -54,7 +57,7 @@ export default function EnhancedProductGrid() {
     categories: [],
     occasions: [],
     materials: [],
-    priceRange: [0, 1000],
+    priceRange: [PRICE_RANGES.DEFAULT_MIN, PRICE_RANGES.DEFAULT_MAX],
     inStock: false,
     minRating: 0,
   });
@@ -72,24 +75,10 @@ export default function EnhancedProductGrid() {
     try {
       setLoading(true);
       
-      // Build query with relationships
+      // Simple query that works with existing database schema
       let query = supabase
         .from('products')
-        .select(`
-          *,
-          product_categories!inner(
-            categories(id, name, slug)
-          ),
-          product_occasions!inner(
-            occasions(id, name, slug)
-          ),
-          product_images(
-            image_url,
-            alt_text,
-            is_primary,
-            sort_order
-          )
-        `)
+        .select('*')
         .eq('is_active', true);
 
       const { data, error } = await query;
@@ -368,7 +357,7 @@ export default function EnhancedProductGrid() {
                         </Badge>
                       </div>
                       <span className="text-2xl font-bold text-foreground">
-                        ${product.base_price}
+                        {formatPrice(product.base_price)}
                       </span>
                     </div>
                   </CardContent>
@@ -388,6 +377,15 @@ export default function EnhancedProductGrid() {
                         Customize
                       </Button>
                     </div>
+                    <div className="mt-3 w-full">
+                      <WhatsAppButton 
+                        onClick={() => openWhatsAppInquiry(product.name)}
+                        size="sm"
+                        className="w-full"
+                      >
+                        Quick WhatsApp Inquiry
+                      </WhatsAppButton>
+                    </div>
                   </CardFooter>
                 </Card>
               ))}
@@ -401,14 +399,14 @@ export default function EnhancedProductGrid() {
                 <Button 
                   variant="outline" 
                   onClick={() => {
-                    setFilters({
-                      categories: [],
-                      occasions: [],
-                      materials: [],
-                      priceRange: [0, 1000],
-                      inStock: false,
-                      minRating: 0,
-                    });
+                                      setFilters({
+                    categories: [],
+                    occasions: [],
+                    materials: [],
+                    priceRange: [PRICE_RANGES.DEFAULT_MIN, PRICE_RANGES.DEFAULT_MAX],
+                    inStock: false,
+                    minRating: 0,
+                  });
                     setSearchQuery('');
                   }}
                 >

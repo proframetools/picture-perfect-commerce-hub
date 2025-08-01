@@ -5,6 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown, X } from 'lucide-react';
+import { formatPrice, PRICE_RANGES } from '@/lib/currency';
 
 interface FilterState {
   categories: string[];
@@ -24,7 +25,7 @@ export default function ProductFilters({ filters, onFiltersChange }: ProductFilt
   const [categories, setCategories] = useState<any[]>([]);
   const [occasions, setOccasions] = useState<any[]>([]);
   const [materials, setMaterials] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([PRICE_RANGES.DEFAULT_MIN, PRICE_RANGES.DEFAULT_MAX]);
 
   useEffect(() => {
     fetchFilterData();
@@ -94,7 +95,7 @@ export default function ProductFilters({ filters, onFiltersChange }: ProductFilt
       categories: [],
       occasions: [],
       materials: [],
-      priceRange: [priceRange[0], priceRange[1]],
+      priceRange: [PRICE_RANGES.DEFAULT_MIN, PRICE_RANGES.DEFAULT_MAX],
       inStock: false,
       minRating: 0,
     });
@@ -106,7 +107,7 @@ export default function ProductFilters({ filters, onFiltersChange }: ProductFilt
     filters.inStock || 
     filters.minRating > 0 ||
     filters.priceRange[0] !== priceRange[0] || 
-    filters.priceRange[1] !== priceRange[1];
+    filters.priceRange[1] !== PRICE_RANGES.DEFAULT_MAX;
 
   return (
     <div className="w-full space-y-6">
@@ -216,8 +217,8 @@ export default function ProductFilters({ filters, onFiltersChange }: ProductFilt
             className="w-full"
           />
           <div className="flex justify-between text-sm text-muted-foreground">
-            <span>${filters.priceRange[0]}</span>
-            <span>${filters.priceRange[1]}</span>
+            <span>{formatPrice(filters.priceRange[0])}</span>
+            <span>{formatPrice(filters.priceRange[1])}</span>
           </div>
         </CollapsibleContent>
       </Collapsible>

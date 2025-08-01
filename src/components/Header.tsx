@@ -4,6 +4,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { Menu, ShoppingCart, User, Search, Heart, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { WhatsAppButton } from "@/components/ui/whatsapp-button";
+import { openWhatsAppInquiry } from "@/lib/whatsapp";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -11,18 +13,12 @@ export const Header = () => {
   const navigate = useNavigate();
 
   const handleCustomFrames = () => {
-    navigate('/#products');
-    setTimeout(() => {
-      const productsSection = document.getElementById('products');
-      if (productsSection) {
-        productsSection.scrollIntoView({ behavior: 'smooth' });
-      }
-    }, 100);
+    navigate('/products');
   };
 
   const navigation = [
     { name: 'Home', href: '/', isLink: true },
-    { name: 'Gallery', href: '/gallery', isLink: true },
+    { name: 'Products', href: '/products', isLink: true },
     { name: 'Custom Frames', href: '#customize', isLink: false, onClick: handleCustomFrames },
     { name: 'Materials', href: '#materials', isLink: false },
     { name: 'About', href: '#about', isLink: false },
@@ -67,6 +63,13 @@ export const Header = () => {
 
           {/* Desktop Actions */}
           <div className="hidden lg:flex items-center space-x-4">
+            <WhatsAppButton 
+              onClick={() => openWhatsAppInquiry()}
+              size="sm"
+              className="hidden xl:flex"
+            >
+              Quick Inquiry
+            </WhatsAppButton>
             <Button variant="ghost" size="icon">
               <Search className="h-5 w-5" />
             </Button>
@@ -152,6 +155,13 @@ export const Header = () => {
                 </nav>
                 
                 <div className="mt-8 space-y-4">
+                  <WhatsAppButton 
+                    onClick={() => openWhatsAppInquiry()}
+                    className="w-full"
+                    size="lg"
+                  >
+                    WhatsApp Inquiry
+                  </WhatsAppButton>
                   <Button variant="elegant" size="lg" className="w-full">
                     <User className="h-5 w-5" />
                     Sign In
