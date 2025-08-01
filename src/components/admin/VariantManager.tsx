@@ -106,7 +106,7 @@ const VariantManager = () => {
       setColors(colorsRes.data || []);
       setMattingOptions(mattingRes.data || []);
 
-      // Temporarily set default data for new tables until types are updated
+      // Use hardcoded data for new tables until types are updated
       setAspectRatios([
         { id: '1', name: '3:2', ratio_value: 1.5, is_active: true },
         { id: '2', name: '4:3', ratio_value: 1.333, is_active: true },
@@ -121,18 +121,33 @@ const VariantManager = () => {
       ]);
     } catch (error) {
       console.error('Error loading data:', error);
-      toast.error('Failed to load variant options');
+      // Fallback to hardcoded data for new tables
+      setAspectRatios([
+        { id: '1', name: '3:2', ratio_value: 1.5, is_active: true },
+        { id: '2', name: '4:3', ratio_value: 1.333, is_active: true },
+        { id: '3', name: '1:1', ratio_value: 1.0, is_active: true },
+        { id: '4', name: '16:9', ratio_value: 1.778, is_active: true }
+      ]);
+      
+      setOrientations([
+        { id: '1', name: 'Landscape', code: 'landscape', is_active: true },
+        { id: '2', name: 'Portrait', code: 'portrait', is_active: true },
+        { id: '3', name: 'Square', code: 'square', is_active: true }
+      ]);
+      toast.error('Using fallback data for aspect ratios and orientations');
     } finally {
       setLoading(false);
     }
   };
 
   const loadVariants = async () => {
+    if (!selectedProduct) return;
+    
     try {
       // For now, show empty variants list until types are updated
       // This will be properly implemented once Supabase types are regenerated
       setVariants([]);
-      toast.info('Variant management will be available after database types are updated');
+      toast.info('Variant loading will be available after database types are updated');
     } catch (error) {
       console.error('Error loading variants:', error);
       toast.error('Failed to load variants');
@@ -150,6 +165,11 @@ const VariantManager = () => {
       const thickness = thicknesses.find(t => t.id === formData.thickness_id);
       
       const sku = `${product?.name?.substring(0, 3).toUpperCase()}-${aspectRatio?.name}-${color?.name?.substring(0, 3).toUpperCase()}-${thickness?.name?.substring(0, 3).toUpperCase()}`.replace(/\s+/g, '');
+
+      const variantData = {
+        ...formData,
+        sku
+      };
 
       // Temporarily disabled until types are updated
       toast.info('Variant creation will be available after database types are updated');

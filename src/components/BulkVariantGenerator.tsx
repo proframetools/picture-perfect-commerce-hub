@@ -3,42 +3,40 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Settings, Play, Check, AlertCircle } from 'lucide-react';
+import { Wand2, Package, AlertCircle, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 
-interface GeneratorOptions {
-  productId: string;
+interface VariantOption {
+  id: string;
+  name: string;
+  [key: string]: any;
+}
+
+interface SelectedOptions {
   aspectRatios: string[];
   orientations: string[];
   sizes: string[];
   colors: string[];
   thicknesses: string[];
-  includeMatting: boolean;
   mattingOptions: string[];
 }
 
-interface GenerationProgress {
-  total: number;
-  completed: number;
-  current: string;
-  errors: string[];
-}
-
-const BulkVariantGenerator: React.FC<{ productId: string }> = ({ productId }) => {
-  const [options, setOptions] = useState<GeneratorOptions>({
-    productId,
-    aspectRatios: [],
-    orientations: [],
-    sizes: [],
-    colors: [],
-    thicknesses: [],
-    includeMatting: false,
-    mattingOptions: []
-  });
+const BulkVariantGenerator = () => {
+  const [selectedProduct, setSelectedProduct] = useState('');
+  const [products, setProducts] = useState<VariantOption[]>([]);
+  const [aspectRatios, setAspectRatios] = useState<VariantOption[]>([]);
+  const [orientations, setOrientations] = useState<VariantOption[]>([]);
+  const [sizes, setSizes] = useState<VariantOption[]>([]);
+  const [colors, setColors] = useState<VariantOption[]>([]);
+  const [thicknesses, setThicknesses] = useState<VariantOption[]>([]);
+  const [mattingOptions, setMattingOptions] = useState<VariantOption[]>([]);
   
-  const [availableOptions, setAvailableOptions] = useState({
+  const [selectedOptions, setSelectedOptions] = useState<SelectedOptions>({
     aspectRatios: [],
     orientations: [],
     sizes: [],
@@ -47,359 +45,289 @@ const BulkVariantGenerator: React.FC<{ productId: string }> = ({ productId }) =>
     mattingOptions: []
   });
   
+  const [defaultStock, setDefaultStock] = useState(50);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [progress, setProgress] = useState<GenerationProgress>({
-    total: 0,
-    completed: 0,
-    current: '',
-    errors: []
-  });
+  const [progress, setProgress] = useState(0);
+  const [estimatedCount, setEstimatedCount] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadAvailableOptions();
+    loadData();
   }, []);
 
-  const loadAvailableOptions = async () => {
+  useEffect(() => {
+    calculateEstimatedCount();
+  }, [selectedOptions]);
+
+  const loadData = async () => {
     try {
-      const [sizesRes, colorsRes, thicknessRes, mattingRes] = await Promise.all([
+      const [
+        productsRes,
+        sizesRes,
+        thicknessRes,
+        colorsRes,
+        mattingRes
+      ] = await Promise.all([
+        supabase.from('products').select('*').eq('is_active', true),
         supabase.from('frame_sizes').select('*').eq('is_active', true),
-        supabase.from('frame_colors').select('*').eq('is_active', true),
         supabase.from('frame_thickness').select('*').eq('is_active', true),
+        supabase.from('frame_colors').select('*').eq('is_active', true),
         supabase.from('matting_options').select('*').eq('is_active', true)
       ]);
 
-      setAvailableOptions({
-        aspectRatios: [
-          { id: '1', name: '3:2', ratio_value: 1.5 },
-          { id: '2', name: '4:3', ratio_value: 1.333 },
-          { id: '3', name: '5:4', ratio_value: 1.25 },
-          { id: '4', name: '1:1', ratio_value: 1.0 },
-          { id: '5', name: '7:5', ratio_value: 1.4 },
-          { id: '6', name: '16:9', ratio_value: 1.778 },
-          { id: '7', name: '2:1', ratio_value: 2.0 },
-          { id: '8', name: '3:1', ratio_value: 3.0 }
-        ],
-        orientations: [
-          { id: '1', name: 'Landscape', code: 'landscape' },
-          { id: '2', name: 'Portrait', code: 'portrait' },
-          { id: '3', name: 'Square', code: 'square' }
-        ],
-        sizes: sizesRes.data || [],
-        colors: colorsRes.data || [],
-        thicknesses: thicknessRes.data || [],
-        mattingOptions: mattingRes.data || []
-      });
-    } catch (error) {
-      console.error('Error loading options:', error);
-      toast.error('Failed to load generation options');
-    }
-  };
-
-  const calculateTotalCombinations = () => {
-    const { aspectRatios, orientations, sizes, colors, thicknesses, includeMatting, mattingOptions } = options;
-    
-    let total = aspectRatios.length * orientations.length * sizes.length * colors.length * thicknesses.length;
-    
-    if (includeMatting && mattingOptions.length > 0) {
-      total *= (mattingOptions.length + 1); // +1 for no matting option
-    }
-    
-    return total;
-  };
-
-  const generateVariants = async () => {
-    setIsGenerating(true);
-    const totalCombinations = calculateTotalCombinations();
-    
-    setProgress({
-      total: totalCombinations,
-      completed: 0,
-      current: 'Starting generation...',
-      errors: []
-    });
-
-    try {
-      let completed = 0;
-      const errors: string[] = [];
-
-      // This is a placeholder for the actual generation logic
-      // In reality, this would create database entries
-      for (const aspectRatio of options.aspectRatios) {
-        for (const orientation of options.orientations) {
-          for (const size of options.sizes) {
-            for (const color of options.colors) {
-              for (const thickness of options.thicknesses) {
-                const mattingCombinations = options.includeMatting 
-                  ? [null, ...options.mattingOptions] 
-                  : [null];
-
-                for (const matting of mattingCombinations) {
-                  const variantName = `${aspectRatio}-${orientation}-${size}-${color}-${thickness}${matting ? `-${matting}` : ''}`;
-                  
-                  setProgress(prev => ({
-                    ...prev,
-                    completed: completed,
-                    current: `Creating variant: ${variantName}`
-                  }));
-
-                  // Simulate processing time
-                  await new Promise(resolve => setTimeout(resolve, 10));
-
-                  try {
-                    // Here would be the actual database insertion
-                    // await createVariant({ productId, aspectRatio, orientation, size, color, thickness, matting });
-                    console.log(`Would create variant: ${variantName}`);
-                  } catch (error) {
-                    errors.push(`Failed to create ${variantName}: ${error}`);
-                  }
-
-                  completed++;
-                }
-              }
-            }
-          }
-        }
-      }
-
-      setProgress(prev => ({
-        ...prev,
-        completed: totalCombinations,
-        current: 'Generation complete!',
-        errors
-      }));
-
-      if (errors.length === 0) {
-        toast.success(`Successfully generated ${totalCombinations} variants!`);
-      } else {
-        toast.warning(`Generated ${totalCombinations - errors.length}/${totalCombinations} variants. ${errors.length} failed.`);
-      }
-
-    } catch (error) {
-      toast.error('Failed to generate variants');
-      console.error('Generation error:', error);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  const toggleOption = (category: keyof GeneratorOptions, value: string) => {
-    setOptions(prev => {
-      const currentArray = prev[category] as string[];
-      const isSelected = currentArray.includes(value);
+      setProducts(productsRes.data || []);
+      setSizes((sizesRes.data || []).map(size => ({ ...size, name: size.display_name })));
+      setThicknesses(thicknessRes.data || []);
+      setColors(colorsRes.data || []);
+      setMattingOptions(mattingRes.data || []);
       
-      return {
-        ...prev,
-        [category]: isSelected 
-          ? currentArray.filter(item => item !== value)
-          : [...currentArray, value]
-      };
-    });
+      // Use hardcoded data for new tables until types are updated
+      setAspectRatios([
+        { id: '1', name: '3:2', ratio_value: 1.5 },
+        { id: '2', name: '4:3', ratio_value: 1.333 },
+        { id: '3', name: '5:4', ratio_value: 1.25 },
+        { id: '4', name: '1:1', ratio_value: 1.0 },
+        { id: '5', name: '7:5', ratio_value: 1.4 },
+        { id: '6', name: '16:9', ratio_value: 1.778 },
+        { id: '7', name: '2:1', ratio_value: 2.0 },
+        { id: '8', name: '3:1', ratio_value: 3.0 }
+      ]);
+      
+      setOrientations([
+        { id: '1', name: 'Landscape', code: 'landscape' },
+        { id: '2', name: 'Portrait', code: 'portrait' },
+        { id: '3', name: 'Square', code: 'square' }
+      ]);
+    } catch (error) {
+      console.error('Error loading data:', error);
+      toast.error('Failed to load options');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const selectAll = (category: keyof GeneratorOptions) => {
-    const availableValues = availableOptions[category as keyof typeof availableOptions];
-    setOptions(prev => ({
+  const calculateEstimatedCount = () => {
+    const count = 
+      Math.max(selectedOptions.aspectRatios.length, 1) *
+      Math.max(selectedOptions.orientations.length, 1) *
+      Math.max(selectedOptions.sizes.length, 1) *
+      Math.max(selectedOptions.colors.length, 1) *
+      Math.max(selectedOptions.thicknesses.length, 1);
+    
+    setEstimatedCount(count);
+  };
+
+  const toggleOption = (category: keyof SelectedOptions, optionId: string) => {
+    setSelectedOptions(prev => ({
       ...prev,
-      [category]: availableValues.map((item: any) => item.id || item.name)
+      [category]: prev[category].includes(optionId)
+        ? prev[category].filter(id => id !== optionId)
+        : [...prev[category], optionId]
     }));
   };
 
-  const clearAll = (category: keyof GeneratorOptions) => {
-    setOptions(prev => ({
+  const selectAll = (category: keyof SelectedOptions, options: VariantOption[]) => {
+    setSelectedOptions(prev => ({
+      ...prev,
+      [category]: options.map(option => option.id)
+    }));
+  };
+
+  const clearAll = (category: keyof SelectedOptions) => {
+    setSelectedOptions(prev => ({
       ...prev,
       [category]: []
     }));
   };
 
-  const totalCombinations = calculateTotalCombinations();
+  const generateVariants = async () => {
+    if (!selectedProduct) {
+      toast.error('Please select a product first');
+      return;
+    }
+
+    if (estimatedCount === 0) {
+      toast.error('Please select at least one option from each category');
+      return;
+    }
+
+    setIsGenerating(true);
+    setProgress(0);
+
+    try {
+      // Simulate generation for now until database types are updated
+      let processed = 0;
+      const total = estimatedCount;
+
+      for (let i = 0; i < total; i++) {
+        // Simulate processing time
+        await new Promise(resolve => setTimeout(resolve, 10));
+        processed++;
+        setProgress((processed / total) * 100);
+      }
+
+      toast.info(`Bulk variant generation will be fully implemented after database types are updated. Would create ${estimatedCount} variants.`);
+      
+      // Reset form
+      setSelectedOptions({
+        aspectRatios: [],
+        orientations: [],
+        sizes: [],
+        colors: [],
+        thicknesses: [],
+        mattingOptions: []
+      });
+      setProgress(0);
+
+    } catch (error: any) {
+      console.error('Error generating variants:', error);
+      toast.error(`Failed to generate variants: ${error.message}`);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const renderOptionGroup = (
+    title: string,
+    category: keyof SelectedOptions,
+    options: VariantOption[],
+    displayKey: string = 'name'
+  ) => (
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex justify-between items-center">
+          <CardTitle className="text-sm font-medium">{title}</CardTitle>
+          <div className="flex gap-2">
+            <Button size="sm" variant="ghost" onClick={() => selectAll(category, options)}>
+              Select All
+            </Button>
+            <Button size="sm" variant="ghost" onClick={() => clearAll(category)}>
+              Clear
+            </Button>
+          </div>
+        </div>
+        <Badge variant="secondary">{selectedOptions[category].length} selected</Badge>
+      </CardHeader>
+      <CardContent className="grid grid-cols-2 gap-2">
+        {options.map(option => (
+          <div key={option.id} className="flex items-center space-x-2">
+            <Checkbox
+              id={`${category}-${option.id}`}
+              checked={selectedOptions[category].includes(option.id)}
+              onCheckedChange={() => toggleOption(category, option.id)}
+            />
+            <Label htmlFor={`${category}-${option.id}`} className="text-sm">
+              {option[displayKey]}
+            </Label>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+
+  if (loading) {
+    return (
+      <Card className="w-full max-w-6xl mx-auto">
+        <CardContent className="p-8 text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Loading options...</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="w-full max-w-6xl mx-auto">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Settings className="w-5 h-5" />
+            <Wand2 className="w-5 h-5" />
             Bulk Variant Generator
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Aspect Ratios */}
-          <div>
-            <div className="flex justify-between items-center mb-3">
-              <h4 className="font-medium">Aspect Ratios</h4>
-              <div className="flex gap-2">
-                <Button size="sm" variant="outline" onClick={() => selectAll('aspectRatios')}>
-                  Select All
-                </Button>
-                <Button size="sm" variant="outline" onClick={() => clearAll('aspectRatios')}>
-                  Clear
-                </Button>
-              </div>
-            </div>
-            <div className="grid grid-cols-4 gap-2">
-              {availableOptions.aspectRatios.map((ratio: any) => (
-                <div key={ratio.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`ratio-${ratio.id}`}
-                    checked={options.aspectRatios.includes(ratio.id)}
-                    onCheckedChange={() => toggleOption('aspectRatios', ratio.id)}
+          {/* Product Selection */}
+          <div className="space-y-2">
+            <Label>Select Product</Label>
+            <Select value={selectedProduct} onValueChange={setSelectedProduct}>
+              <SelectTrigger>
+                <SelectValue placeholder="Choose a product to generate variants for" />
+              </SelectTrigger>
+              <SelectContent>
+                {products.map(product => (
+                  <SelectItem key={product.id} value={product.id}>
+                    {product.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Generation Settings */}
+          {selectedProduct && (
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Default Stock Quantity</Label>
+                  <Input
+                    type="number"
+                    value={defaultStock}
+                    onChange={(e) => setDefaultStock(Number(e.target.value))}
+                    min="0"
                   />
-                  <label htmlFor={`ratio-${ratio.id}`} className="text-sm">
-                    {ratio.name}
-                  </label>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Orientations */}
-          <div>
-            <div className="flex justify-between items-center mb-3">
-              <h4 className="font-medium">Orientations</h4>
-              <div className="flex gap-2">
-                <Button size="sm" variant="outline" onClick={() => selectAll('orientations')}>
-                  Select All
-                </Button>
-                <Button size="sm" variant="outline" onClick={() => clearAll('orientations')}>
-                  Clear
-                </Button>
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              {availableOptions.orientations.map((orientation: any) => (
-                <div key={orientation.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`orientation-${orientation.id}`}
-                    checked={options.orientations.includes(orientation.id)}
-                    onCheckedChange={() => toggleOption('orientations', orientation.id)}
-                  />
-                  <label htmlFor={`orientation-${orientation.id}`} className="text-sm">
-                    {orientation.name}
-                  </label>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Sizes */}
-          <div>
-            <div className="flex justify-between items-center mb-3">
-              <h4 className="font-medium">Frame Sizes</h4>
-              <div className="flex gap-2">
-                <Button size="sm" variant="outline" onClick={() => selectAll('sizes')}>
-                  Select All
-                </Button>
-                <Button size="sm" variant="outline" onClick={() => clearAll('sizes')}>
-                  Clear
-                </Button>
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              {availableOptions.sizes.map((size: any) => (
-                <div key={size.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`size-${size.id}`}
-                    checked={options.sizes.includes(size.id)}
-                    onCheckedChange={() => toggleOption('sizes', size.id)}
-                  />
-                  <label htmlFor={`size-${size.id}`} className="text-sm">
-                    {size.display_name}
-                  </label>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Colors */}
-          <div>
-            <div className="flex justify-between items-center mb-3">
-              <h4 className="font-medium">Frame Colors</h4>
-              <div className="flex gap-2">
-                <Button size="sm" variant="outline" onClick={() => selectAll('colors')}>
-                  Select All
-                </Button>
-                <Button size="sm" variant="outline" onClick={() => clearAll('colors')}>
-                  Clear
-                </Button>
-              </div>
-            </div>
-            <div className="grid grid-cols-4 gap-2">
-              {availableOptions.colors.map((color: any) => (
-                <div key={color.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`color-${color.id}`}
-                    checked={options.colors.includes(color.id)}
-                    onCheckedChange={() => toggleOption('colors', color.id)}
-                  />
-                  <label htmlFor={`color-${color.id}`} className="text-sm">
-                    {color.name}
-                  </label>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Generation Summary */}
-          <div className="bg-muted p-4 rounded-lg">
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-medium">Total Combinations:</span>
-              <Badge variant="secondary" className="text-lg px-3 py-1">
-                {totalCombinations.toLocaleString()}
-              </Badge>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              This will create {totalCombinations} unique product variants based on your selections.
-            </p>
-          </div>
-
-          {/* Generation Button */}
-          <div className="flex justify-center">
-            <Button 
-              onClick={generateVariants}
-              disabled={isGenerating || totalCombinations === 0}
-              size="lg"
-              className="w-full max-w-sm"
-            >
-              {isGenerating ? (
-                <>
-                  <Settings className="w-4 h-4 mr-2 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Play className="w-4 h-4 mr-2" />
-                  Generate {totalCombinations} Variants
-                </>
-              )}
-            </Button>
-          </div>
-
-          {/* Progress Display */}
-          {isGenerating && (
-            <div className="space-y-3">
-              <Progress value={(progress.completed / progress.total) * 100} className="w-full" />
-              <div className="text-center">
-                <p className="text-sm font-medium">{progress.current}</p>
-                <p className="text-xs text-muted-foreground">
-                  {progress.completed} of {progress.total} completed
-                </p>
-              </div>
-              {progress.errors.length > 0 && (
-                <div className="bg-destructive/10 border border-destructive/20 rounded p-3">
-                  <div className="flex items-center gap-2 mb-2">
-                    <AlertCircle className="w-4 h-4 text-destructive" />
-                    <span className="text-sm font-medium text-destructive">
-                      {progress.errors.length} Errors
-                    </span>
-                  </div>
-                  <div className="max-h-32 overflow-y-auto text-xs text-muted-foreground">
-                    {progress.errors.map((error, index) => (
-                      <div key={index}>{error}</div>
-                    ))}
+                <div className="space-y-2">
+                  <Label>Estimated Variants</Label>
+                  <div className="flex items-center gap-2 p-2 border rounded">
+                    <Package className="w-4 h-4" />
+                    <span className="font-medium">{estimatedCount.toLocaleString()}</span>
                   </div>
                 </div>
+              </div>
+
+              {/* Option Selection Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {renderOptionGroup('Aspect Ratios', 'aspectRatios', aspectRatios)}
+                {renderOptionGroup('Orientations', 'orientations', orientations)}
+                {renderOptionGroup('Sizes', 'sizes', sizes, 'display_name')}
+                {renderOptionGroup('Colors', 'colors', colors)}
+                {renderOptionGroup('Thickness', 'thicknesses', thicknesses)}
+                {renderOptionGroup('Matting (Optional)', 'mattingOptions', mattingOptions)}
+              </div>
+
+              {/* Progress */}
+              {isGenerating && (
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <Label>Generating Variants...</Label>
+                    <span className="text-sm text-muted-foreground">{Math.round(progress)}%</span>
+                  </div>
+                  <Progress value={progress} />
+                </div>
               )}
-            </div>
+
+              {/* Generate Button */}
+              <div className="flex justify-center">
+                <Button
+                  onClick={generateVariants}
+                  disabled={isGenerating || estimatedCount === 0}
+                  className="w-full max-w-md"
+                  size="lg"
+                >
+                  <Zap className="w-4 h-4 mr-2" />
+                  {isGenerating ? 'Generating...' : `Generate ${estimatedCount} Variants`}
+                </Button>
+              </div>
+
+              {estimatedCount > 1000 && (
+                <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                  <AlertCircle className="w-4 h-4 text-amber-600" />
+                  <p className="text-sm text-amber-800">
+                    You're about to generate {estimatedCount.toLocaleString()} variants. This feature will be available after database types are updated.
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </CardContent>
       </Card>
