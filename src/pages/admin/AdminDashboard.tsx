@@ -65,18 +65,11 @@ const AdminDashboard = () => {
 
   const navigationItems = [
     { 
-      title: 'Products', 
-      description: 'Manage products and categories',
+      title: 'Product Management', 
+      description: 'Manage products, upload images, and frame assets',
       icon: Package,
-      path: '/admin/products',
+      path: '/admin/product-management',
       count: stats.products
-    },
-    { 
-      title: 'Product Variants', 
-      description: 'Manage product variants and combinations',
-      icon: Frame,
-      path: '/admin/variants',
-      count: stats.variants
     },
     { 
       title: 'Frame Colors', 
