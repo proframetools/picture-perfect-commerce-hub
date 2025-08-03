@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_roles: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          role?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      aspect_ratios: {
+        Row: {
+          created_at: string
+          height_ratio: number
+          id: string
+          is_active: boolean
+          name: string
+          ratio_value: number
+          sort_order: number | null
+          width_ratio: number
+        }
+        Insert: {
+          created_at?: string
+          height_ratio: number
+          id?: string
+          is_active?: boolean
+          name: string
+          ratio_value: number
+          sort_order?: number | null
+          width_ratio: number
+        }
+        Update: {
+          created_at?: string
+          height_ratio?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          ratio_value?: number
+          sort_order?: number | null
+          width_ratio?: number
+        }
+        Relationships: []
+      }
       cart_items: {
         Row: {
           color_id: string
@@ -174,6 +231,30 @@ export type Database = {
         }
         Relationships: []
       }
+      frame_orientations: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+        }
+        Relationships: []
+      }
       frame_sizes: {
         Row: {
           display_name: string
@@ -258,42 +339,6 @@ export type Database = {
           name?: string
           price_adjustment?: number
           thickness_inches?: number
-        }
-        Relationships: []
-      }
-      occasions: {
-        Row: {
-          created_at: string
-          description: string | null
-          id: string
-          image_url: string | null
-          is_active: boolean
-          name: string
-          slug: string
-          sort_order: number | null
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          image_url?: string | null
-          is_active?: boolean
-          name: string
-          slug: string
-          sort_order?: number | null
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          image_url?: string | null
-          is_active?: boolean
-          name?: string
-          slug?: string
-          sort_order?: number | null
-          updated_at?: string
         }
         Relationships: []
       }
@@ -410,87 +455,6 @@ export type Database = {
         }
         Relationships: []
       }
-      popular_combinations: {
-        Row: {
-          color_id: string
-          created_at: string
-          description: string | null
-          id: string
-          is_active: boolean
-          is_staff_pick: boolean
-          matting_id: string | null
-          name: string
-          popularity_score: number
-          product_id: string
-          size_id: string
-          thickness_id: string | null
-        }
-        Insert: {
-          color_id: string
-          created_at?: string
-          description?: string | null
-          id?: string
-          is_active?: boolean
-          is_staff_pick?: boolean
-          matting_id?: string | null
-          name: string
-          popularity_score?: number
-          product_id: string
-          size_id: string
-          thickness_id?: string | null
-        }
-        Update: {
-          color_id?: string
-          created_at?: string
-          description?: string | null
-          id?: string
-          is_active?: boolean
-          is_staff_pick?: boolean
-          matting_id?: string | null
-          name?: string
-          popularity_score?: number
-          product_id?: string
-          size_id?: string
-          thickness_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "popular_combinations_color_id_fkey"
-            columns: ["color_id"]
-            isOneToOne: false
-            referencedRelation: "frame_colors"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "popular_combinations_matting_id_fkey"
-            columns: ["matting_id"]
-            isOneToOne: false
-            referencedRelation: "matting_options"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "popular_combinations_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "popular_combinations_size_id_fkey"
-            columns: ["size_id"]
-            isOneToOne: false
-            referencedRelation: "frame_sizes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "popular_combinations_thickness_id_fkey"
-            columns: ["thickness_id"]
-            isOneToOne: false
-            referencedRelation: "frame_thickness"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       product_categories: {
         Row: {
           category_id: string
@@ -565,42 +529,6 @@ export type Database = {
           },
         ]
       }
-      product_occasions: {
-        Row: {
-          created_at: string
-          id: string
-          occasion_id: string
-          product_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          occasion_id: string
-          product_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          occasion_id?: string
-          product_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "product_occasions_occasion_id_fkey"
-            columns: ["occasion_id"]
-            isOneToOne: false
-            referencedRelation: "occasions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "product_occasions_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       product_reviews: {
         Row: {
           created_at: string
@@ -654,41 +582,59 @@ export type Database = {
           },
         ]
       }
-      product_tags: {
+      product_variants: {
         Row: {
+          aspect_ratio_id: string
+          color_id: string
           created_at: string
           id: string
+          is_active: boolean
+          matting_id: string | null
+          orientation_id: string
+          price_override: number | null
           product_id: string
-          tag_id: string
+          size_id: string
+          sku: string | null
+          stock_quantity: number | null
+          thickness_id: string
+          updated_at: string
+          variant_image_url: string | null
         }
         Insert: {
+          aspect_ratio_id: string
+          color_id: string
           created_at?: string
           id?: string
+          is_active?: boolean
+          matting_id?: string | null
+          orientation_id: string
+          price_override?: number | null
           product_id: string
-          tag_id: string
+          size_id: string
+          sku?: string | null
+          stock_quantity?: number | null
+          thickness_id: string
+          updated_at?: string
+          variant_image_url?: string | null
         }
         Update: {
+          aspect_ratio_id?: string
+          color_id?: string
           created_at?: string
           id?: string
+          is_active?: boolean
+          matting_id?: string | null
+          orientation_id?: string
+          price_override?: number | null
           product_id?: string
-          tag_id?: string
+          size_id?: string
+          sku?: string | null
+          stock_quantity?: number | null
+          thickness_id?: string
+          updated_at?: string
+          variant_image_url?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "product_tags_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "product_tags_tag_id_fkey"
-            columns: ["tag_id"]
-            isOneToOne: false
-            referencedRelation: "tags"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       products: {
         Row: {
@@ -699,6 +645,7 @@ export type Database = {
           id: string
           image_url: string | null
           is_active: boolean
+          is_featured: boolean | null
           material: Database["public"]["Enums"]["frame_material"]
           name: string
           popularity_score: number | null
@@ -715,6 +662,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean
+          is_featured?: boolean | null
           material: Database["public"]["Enums"]["frame_material"]
           name: string
           popularity_score?: number | null
@@ -731,6 +679,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean
+          is_featured?: boolean | null
           material?: Database["public"]["Enums"]["frame_material"]
           name?: string
           popularity_score?: number | null
@@ -738,33 +687,6 @@ export type Database = {
           stock_quantity?: number | null
           style?: Database["public"]["Enums"]["frame_style"]
           updated_at?: string
-        }
-        Relationships: []
-      }
-      tags: {
-        Row: {
-          color: string | null
-          created_at: string
-          id: string
-          is_active: boolean
-          name: string
-          slug: string
-        }
-        Insert: {
-          color?: string | null
-          created_at?: string
-          id?: string
-          is_active?: boolean
-          name: string
-          slug: string
-        }
-        Update: {
-          color?: string | null
-          created_at?: string
-          id?: string
-          is_active?: boolean
-          name?: string
-          slug?: string
         }
         Relationships: []
       }
@@ -813,44 +735,15 @@ export type Database = {
         }
         Relationships: []
       }
-      wishlists: {
-        Row: {
-          created_at: string
-          id: string
-          product_id: string
-          session_id: string | null
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          product_id: string
-          session_id?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          product_id?: string
-          session_id?: string | null
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "wishlists_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_super_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
     }
     Enums: {
       frame_material: "wood" | "metal" | "acrylic" | "composite"
