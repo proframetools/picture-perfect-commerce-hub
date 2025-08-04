@@ -17,23 +17,32 @@ export type Database = {
       admin_roles: {
         Row: {
           created_at: string
+          granted_at: string
+          granted_by: string | null
           id: string
           is_active: boolean
           role: string
+          updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
+          granted_at?: string
+          granted_by?: string | null
           id?: string
           is_active?: boolean
           role?: string
+          updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
+          granted_at?: string
+          granted_by?: string | null
           id?: string
           is_active?: boolean
           role?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -41,243 +50,131 @@ export type Database = {
       aspect_ratios: {
         Row: {
           created_at: string
+          display_name: string
           height_ratio: number
           id: string
           is_active: boolean
           name: string
-          ratio_value: number
-          sort_order: number | null
+          updated_at: string
           width_ratio: number
         }
         Insert: {
           created_at?: string
+          display_name: string
           height_ratio: number
           id?: string
           is_active?: boolean
           name: string
-          ratio_value: number
-          sort_order?: number | null
+          updated_at?: string
           width_ratio: number
         }
         Update: {
           created_at?: string
+          display_name?: string
           height_ratio?: number
           id?: string
           is_active?: boolean
           name?: string
-          ratio_value?: number
-          sort_order?: number | null
+          updated_at?: string
           width_ratio?: number
-        }
-        Relationships: []
-      }
-      cart_items: {
-        Row: {
-          color_id: string
-          created_at: string
-          custom_height_inches: number | null
-          custom_image_url: string | null
-          custom_width_inches: number | null
-          id: string
-          matting_id: string | null
-          photo_id: string | null
-          product_id: string
-          quantity: number
-          session_id: string | null
-          size_id: string
-          special_instructions: string | null
-          thickness_id: string | null
-          updated_at: string
-          user_id: string | null
-        }
-        Insert: {
-          color_id: string
-          created_at?: string
-          custom_height_inches?: number | null
-          custom_image_url?: string | null
-          custom_width_inches?: number | null
-          id?: string
-          matting_id?: string | null
-          photo_id?: string | null
-          product_id: string
-          quantity?: number
-          session_id?: string | null
-          size_id: string
-          special_instructions?: string | null
-          thickness_id?: string | null
-          updated_at?: string
-          user_id?: string | null
-        }
-        Update: {
-          color_id?: string
-          created_at?: string
-          custom_height_inches?: number | null
-          custom_image_url?: string | null
-          custom_width_inches?: number | null
-          id?: string
-          matting_id?: string | null
-          photo_id?: string | null
-          product_id?: string
-          quantity?: number
-          session_id?: string | null
-          size_id?: string
-          special_instructions?: string | null
-          thickness_id?: string | null
-          updated_at?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "cart_items_color_id_fkey"
-            columns: ["color_id"]
-            isOneToOne: false
-            referencedRelation: "frame_colors"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cart_items_matting_id_fkey"
-            columns: ["matting_id"]
-            isOneToOne: false
-            referencedRelation: "matting_options"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cart_items_photo_id_fkey"
-            columns: ["photo_id"]
-            isOneToOne: false
-            referencedRelation: "uploaded_photos"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cart_items_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cart_items_size_id_fkey"
-            columns: ["size_id"]
-            isOneToOne: false
-            referencedRelation: "frame_sizes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cart_items_thickness_id_fkey"
-            columns: ["thickness_id"]
-            isOneToOne: false
-            referencedRelation: "frame_thickness"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      categories: {
-        Row: {
-          created_at: string
-          description: string | null
-          id: string
-          image_url: string | null
-          is_active: boolean
-          name: string
-          slug: string
-          sort_order: number | null
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          image_url?: string | null
-          is_active?: boolean
-          name: string
-          slug: string
-          sort_order?: number | null
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          image_url?: string | null
-          is_active?: boolean
-          name?: string
-          slug?: string
-          sort_order?: number | null
-          updated_at?: string
         }
         Relationships: []
       }
       frame_colors: {
         Row: {
-          hex_code: string
+          created_at: string
+          display_name: string
+          hex_code: string | null
           id: string
           is_active: boolean
           name: string
-          price_adjustment: number
+          price_adjustment: number | null
+          updated_at: string
         }
         Insert: {
-          hex_code: string
+          created_at?: string
+          display_name: string
+          hex_code?: string | null
           id?: string
           is_active?: boolean
           name: string
-          price_adjustment?: number
+          price_adjustment?: number | null
+          updated_at?: string
         }
         Update: {
-          hex_code?: string
+          created_at?: string
+          display_name?: string
+          hex_code?: string | null
           id?: string
           is_active?: boolean
           name?: string
-          price_adjustment?: number
+          price_adjustment?: number | null
+          updated_at?: string
         }
         Relationships: []
       }
       frame_orientations: {
         Row: {
-          code: string
           created_at: string
+          description: string | null
+          display_name: string
           id: string
           is_active: boolean
           name: string
+          updated_at: string
         }
         Insert: {
-          code: string
           created_at?: string
+          description?: string | null
+          display_name: string
           id?: string
           is_active?: boolean
           name: string
+          updated_at?: string
         }
         Update: {
-          code?: string
           created_at?: string
+          description?: string | null
+          display_name?: string
           id?: string
           is_active?: boolean
           name?: string
+          updated_at?: string
         }
         Relationships: []
       }
       frame_sizes: {
         Row: {
+          created_at: string
           display_name: string
           height_inches: number
           id: string
           is_active: boolean
+          name: string
           price_multiplier: number
+          updated_at: string
           width_inches: number
         }
         Insert: {
+          created_at?: string
           display_name: string
           height_inches: number
           id?: string
           is_active?: boolean
+          name: string
           price_multiplier?: number
+          updated_at?: string
           width_inches: number
         }
         Update: {
+          created_at?: string
           display_name?: string
           height_inches?: number
           id?: string
           is_active?: boolean
+          name?: string
           price_multiplier?: number
+          updated_at?: string
           width_inches?: number
         }
         Relationships: []
@@ -285,299 +182,133 @@ export type Database = {
       frame_thickness: {
         Row: {
           created_at: string
+          display_name: string
           id: string
           is_active: boolean
           name: string
-          price_multiplier: number
-          width_inches: number
+          price_adjustment: number | null
+          thickness_mm: number
+          updated_at: string
         }
         Insert: {
           created_at?: string
+          display_name: string
           id?: string
           is_active?: boolean
           name: string
-          price_multiplier?: number
-          width_inches: number
+          price_adjustment?: number | null
+          thickness_mm: number
+          updated_at?: string
         }
         Update: {
           created_at?: string
+          display_name?: string
           id?: string
           is_active?: boolean
           name?: string
-          price_multiplier?: number
-          width_inches?: number
+          price_adjustment?: number | null
+          thickness_mm?: number
+          updated_at?: string
         }
         Relationships: []
       }
       matting_options: {
         Row: {
-          color_hex: string
           created_at: string
+          description: string | null
+          display_name: string
           id: string
           is_active: boolean
-          is_double_mat: boolean
           name: string
-          price_adjustment: number
-          thickness_inches: number
+          price_adjustment: number | null
+          updated_at: string
         }
         Insert: {
-          color_hex: string
           created_at?: string
+          description?: string | null
+          display_name: string
           id?: string
           is_active?: boolean
-          is_double_mat?: boolean
           name: string
-          price_adjustment?: number
-          thickness_inches: number
+          price_adjustment?: number | null
+          updated_at?: string
         }
         Update: {
-          color_hex?: string
           created_at?: string
+          description?: string | null
+          display_name?: string
           id?: string
           is_active?: boolean
-          is_double_mat?: boolean
           name?: string
-          price_adjustment?: number
-          thickness_inches?: number
+          price_adjustment?: number | null
+          updated_at?: string
         }
         Relationships: []
       }
-      order_items: {
+      preview_images: {
         Row: {
+          alt_text: string | null
+          aspect_ratio_id: string
           color_id: string
           created_at: string
-          custom_image_url: string | null
           id: string
-          order_id: string
-          product_id: string
-          quantity: number
-          size_id: string
-          special_instructions: string | null
-          unit_price: number
+          image_url: string
+          is_active: boolean
+          orientation_id: string
+          thickness_id: string
+          updated_at: string
         }
         Insert: {
+          alt_text?: string | null
+          aspect_ratio_id: string
           color_id: string
           created_at?: string
-          custom_image_url?: string | null
           id?: string
-          order_id: string
-          product_id: string
-          quantity: number
-          size_id: string
-          special_instructions?: string | null
-          unit_price: number
+          image_url: string
+          is_active?: boolean
+          orientation_id: string
+          thickness_id: string
+          updated_at?: string
         }
         Update: {
+          alt_text?: string | null
+          aspect_ratio_id?: string
           color_id?: string
           created_at?: string
-          custom_image_url?: string | null
           id?: string
-          order_id?: string
-          product_id?: string
-          quantity?: number
-          size_id?: string
-          special_instructions?: string | null
-          unit_price?: number
+          image_url?: string
+          is_active?: boolean
+          orientation_id?: string
+          thickness_id?: string
+          updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "order_items_color_id_fkey"
+            foreignKeyName: "preview_images_aspect_ratio_id_fkey"
+            columns: ["aspect_ratio_id"]
+            isOneToOne: false
+            referencedRelation: "aspect_ratios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "preview_images_color_id_fkey"
             columns: ["color_id"]
             isOneToOne: false
             referencedRelation: "frame_colors"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "order_items_order_id_fkey"
-            columns: ["order_id"]
+            foreignKeyName: "preview_images_orientation_id_fkey"
+            columns: ["orientation_id"]
             isOneToOne: false
-            referencedRelation: "orders"
+            referencedRelation: "frame_orientations"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "order_items_product_id_fkey"
-            columns: ["product_id"]
+            foreignKeyName: "preview_images_thickness_id_fkey"
+            columns: ["thickness_id"]
             isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "order_items_size_id_fkey"
-            columns: ["size_id"]
-            isOneToOne: false
-            referencedRelation: "frame_sizes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      orders: {
-        Row: {
-          billing_address: Json | null
-          created_at: string
-          email: string
-          id: string
-          notes: string | null
-          payment_method: string | null
-          payment_status: string | null
-          shipping_address: Json
-          status: Database["public"]["Enums"]["order_status"]
-          total_amount: number
-          updated_at: string
-          user_id: string | null
-        }
-        Insert: {
-          billing_address?: Json | null
-          created_at?: string
-          email: string
-          id?: string
-          notes?: string | null
-          payment_method?: string | null
-          payment_status?: string | null
-          shipping_address: Json
-          status?: Database["public"]["Enums"]["order_status"]
-          total_amount: number
-          updated_at?: string
-          user_id?: string | null
-        }
-        Update: {
-          billing_address?: Json | null
-          created_at?: string
-          email?: string
-          id?: string
-          notes?: string | null
-          payment_method?: string | null
-          payment_status?: string | null
-          shipping_address?: Json
-          status?: Database["public"]["Enums"]["order_status"]
-          total_amount?: number
-          updated_at?: string
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      product_categories: {
-        Row: {
-          category_id: string
-          created_at: string
-          id: string
-          product_id: string
-        }
-        Insert: {
-          category_id: string
-          created_at?: string
-          id?: string
-          product_id: string
-        }
-        Update: {
-          category_id?: string
-          created_at?: string
-          id?: string
-          product_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "product_categories_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "categories"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "product_categories_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      product_images: {
-        Row: {
-          alt_text: string | null
-          created_at: string
-          id: string
-          image_url: string
-          is_primary: boolean | null
-          product_id: string
-          sort_order: number | null
-        }
-        Insert: {
-          alt_text?: string | null
-          created_at?: string
-          id?: string
-          image_url: string
-          is_primary?: boolean | null
-          product_id: string
-          sort_order?: number | null
-        }
-        Update: {
-          alt_text?: string | null
-          created_at?: string
-          id?: string
-          image_url?: string
-          is_primary?: boolean | null
-          product_id?: string
-          sort_order?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "product_images_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      product_reviews: {
-        Row: {
-          created_at: string
-          customer_email: string | null
-          customer_name: string
-          id: string
-          is_approved: boolean | null
-          is_verified_purchase: boolean | null
-          product_id: string
-          rating: number
-          review_text: string | null
-          title: string | null
-          updated_at: string
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          customer_email?: string | null
-          customer_name: string
-          id?: string
-          is_approved?: boolean | null
-          is_verified_purchase?: boolean | null
-          product_id: string
-          rating: number
-          review_text?: string | null
-          title?: string | null
-          updated_at?: string
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          customer_email?: string | null
-          customer_name?: string
-          id?: string
-          is_approved?: boolean | null
-          is_verified_purchase?: boolean | null
-          product_id?: string
-          rating?: number
-          review_text?: string | null
-          title?: string | null
-          updated_at?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "product_reviews_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
+            referencedRelation: "frame_thickness"
             referencedColumns: ["id"]
           },
         ]
@@ -591,14 +322,13 @@ export type Database = {
           is_active: boolean
           matting_id: string | null
           orientation_id: string
-          price_override: number | null
+          price_adjustment: number | null
           product_id: string
           size_id: string
-          sku: string | null
+          sku: string
           stock_quantity: number | null
           thickness_id: string
           updated_at: string
-          variant_image_url: string | null
         }
         Insert: {
           aspect_ratio_id: string
@@ -608,14 +338,13 @@ export type Database = {
           is_active?: boolean
           matting_id?: string | null
           orientation_id: string
-          price_override?: number | null
+          price_adjustment?: number | null
           product_id: string
           size_id: string
-          sku?: string | null
+          sku: string
           stock_quantity?: number | null
           thickness_id: string
           updated_at?: string
-          variant_image_url?: string | null
         }
         Update: {
           aspect_ratio_id?: string
@@ -625,113 +354,96 @@ export type Database = {
           is_active?: boolean
           matting_id?: string | null
           orientation_id?: string
-          price_override?: number | null
+          price_adjustment?: number | null
           product_id?: string
           size_id?: string
-          sku?: string | null
+          sku?: string
           stock_quantity?: number | null
           thickness_id?: string
           updated_at?: string
-          variant_image_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "product_variants_aspect_ratio_id_fkey"
+            columns: ["aspect_ratio_id"]
+            isOneToOne: false
+            referencedRelation: "aspect_ratios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_variants_color_id_fkey"
+            columns: ["color_id"]
+            isOneToOne: false
+            referencedRelation: "frame_colors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_variants_matting_id_fkey"
+            columns: ["matting_id"]
+            isOneToOne: false
+            referencedRelation: "matting_options"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_variants_orientation_id_fkey"
+            columns: ["orientation_id"]
+            isOneToOne: false
+            referencedRelation: "frame_orientations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_variants_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_variants_size_id_fkey"
+            columns: ["size_id"]
+            isOneToOne: false
+            referencedRelation: "frame_sizes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_variants_thickness_id_fkey"
+            columns: ["thickness_id"]
+            isOneToOne: false
+            referencedRelation: "frame_thickness"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       products: {
         Row: {
-          average_rating: number | null
           base_price: number
+          category: string | null
           created_at: string
           description: string | null
           id: string
-          image_url: string | null
           is_active: boolean
-          is_featured: boolean | null
-          material: Database["public"]["Enums"]["frame_material"]
           name: string
-          popularity_score: number | null
-          review_count: number | null
-          stock_quantity: number | null
-          style: Database["public"]["Enums"]["frame_style"]
           updated_at: string
         }
         Insert: {
-          average_rating?: number | null
-          base_price: number
-          created_at?: string
-          description?: string | null
-          id?: string
-          image_url?: string | null
-          is_active?: boolean
-          is_featured?: boolean | null
-          material: Database["public"]["Enums"]["frame_material"]
-          name: string
-          popularity_score?: number | null
-          review_count?: number | null
-          stock_quantity?: number | null
-          style: Database["public"]["Enums"]["frame_style"]
-          updated_at?: string
-        }
-        Update: {
-          average_rating?: number | null
           base_price?: number
+          category?: string | null
           created_at?: string
           description?: string | null
           id?: string
-          image_url?: string | null
           is_active?: boolean
-          is_featured?: boolean | null
-          material?: Database["public"]["Enums"]["frame_material"]
-          name?: string
-          popularity_score?: number | null
-          review_count?: number | null
-          stock_quantity?: number | null
-          style?: Database["public"]["Enums"]["frame_style"]
+          name: string
           updated_at?: string
         }
-        Relationships: []
-      }
-      uploaded_photos: {
-        Row: {
-          created_at: string
-          dpi: number | null
-          file_name: string
-          file_size: number
-          file_type: string
-          height_pixels: number
-          id: string
-          is_processed: boolean
-          session_id: string | null
-          storage_path: string
-          user_id: string | null
-          width_pixels: number
-        }
-        Insert: {
-          created_at?: string
-          dpi?: number | null
-          file_name: string
-          file_size: number
-          file_type: string
-          height_pixels: number
-          id?: string
-          is_processed?: boolean
-          session_id?: string | null
-          storage_path: string
-          user_id?: string | null
-          width_pixels: number
-        }
         Update: {
+          base_price?: number
+          category?: string | null
           created_at?: string
-          dpi?: number | null
-          file_name?: string
-          file_size?: number
-          file_type?: string
-          height_pixels?: number
+          description?: string | null
           id?: string
-          is_processed?: boolean
-          session_id?: string | null
-          storage_path?: string
-          user_id?: string | null
-          width_pixels?: number
+          is_active?: boolean
+          name?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -740,21 +452,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      is_super_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
-      frame_material: "wood" | "metal" | "acrylic" | "composite"
-      frame_style: "modern" | "classic" | "rustic" | "minimalist" | "ornate"
-      order_status:
-        | "pending"
-        | "processing"
-        | "in_production"
-        | "shipped"
-        | "delivered"
-        | "cancelled"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -881,17 +582,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      frame_material: ["wood", "metal", "acrylic", "composite"],
-      frame_style: ["modern", "classic", "rustic", "minimalist", "ornate"],
-      order_status: [
-        "pending",
-        "processing",
-        "in_production",
-        "shipped",
-        "delivered",
-        "cancelled",
-      ],
-    },
+    Enums: {},
   },
 } as const
